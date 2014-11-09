@@ -23,7 +23,7 @@ class coalition:
 def distance_1(A, B):
     dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
     return dist['s12']
-# End of distance
+# End of geocode distance
 
 def midpoint(A,B):
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
