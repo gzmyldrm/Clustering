@@ -89,49 +89,27 @@ def merge(A, B):
 # Choose the distance function here
 distance = distance_3a
 
-file = open("Coalitions geodistance.txt", "w")
+in_f = open("input_coalitions.txt", "r")
 
-coalitions = [
-coalition("Albania", 41.3275459, 19.8186982, 1227, 1229),
-coalition("Austria", 48.2081743, 16.3738189, 6935, 25702),
-coalition("Belgium", 50.8503396, 4.3517103, 8639, 47190),
-coalition("Bulgaria", 42.6977082, 23.3218675, 7251, 11971),
-coalition("Czech Republic", 50.0755381, 14.4378005, 12389, 43368),
-coalition("Denmark",  55.6760968, 12.5683371, 4271, 29654),
-coalition("Finland", 60.17332440000001, 24.9410248, 4009, 17051),
-coalition("France",  48.856614, 2.3522219,42518, 220492),
-coalition("East Germany", 52.5200066, 13.404954, 18388, 51412), 
-coalition("West Germany", 50.73743, 7.0982068, 50958, 213942),
-coalition("Greece", 37.983917, 23.7293599, 7566, 14489),
-coalition("Hungary", 47.497912, 19.040235, 9338, 23158),
-coalition("Iceland", 64.133333, -21.933333, 143, 762),
-coalition("Ireland", 53.3498053, -6.2603097, 2963, 10231),
-coalition("Italy", 41.8723889, 12.4801802, 47105, 164957),
-coalition("Liechtenstein", 47.14137, 9.5207, 14, 159),
-coalition("Luxembourg", 49.815273, 6.129583, 296, 2481),
-coalition("Monaco",  43.73841760000001, 7.4246158, 18, 158),
-coalition("Netherlands", 52.3702157, 4.895167900000001, 10114, 60642),
-coalition("Norway", 59.9138688, 10.7522454, 3265, 17728),
-coalition("Poland", 52.2296756, 21.0122287, 24824, 60742),
-coalition("Portugal",  38.7222524, -9.1393366, 8443, 17615),
-coalition("Romania", 44.4325, 26.103889, 16311, 19279),
-coalition("Soviet Union", 55.755826, 37.6173, 179571, 510243),
-coalition("Spain", 40.4167754, -3.7037902, 28063,61429),
-coalition("Sweden", 59.3293235, 18.0685808, 7014, 47478),
-coalition("Switzerland", 46.9479222, 7.4446085, 4694, 42545),
-coalition("United Kingdom",  51.5073509, -0.1277583, 50127, 347850),
-coalition("Yugoslavia", 44.816667, 20.466667, 16298, 25277),
-]
+coalitions = []
 
-# Google map - according to the capitals 1950
+for line in in_f:    
+    
+    # Allow comments in the text file
+    if "#" in line:
+        continue
+    
+    # split by "," and remove extra whitespace
+    [name, lat, lng, gdp, pop] = [x.strip() for x in line.split(",")]
 
-# GDP for eat and west germany http://books.google.at/books?id=YeoEiNLtrLsC&pg=PA178&lpg=PA178&dq=Maddison,+1950+east+german+gdp&source=bl&ots=TAkNRGDaAR&sig=jzG_cfbPVLdkOeLOug4zHlDyCjA&hl=en&sa=X&ei=JNJgVLPJA4GOPcuSgLAB&ved=0CB8Q6AEwAA#v=onepage&q=Maddison%2C%201950%20east%20german%20gdp&f=false
+    # Create coalition object and add to list
+    coalitions.append(coalition(name, 
+                                float(lat), 
+                                float(lng), 
+                                int(gdp), 
+                                int(pop)))
+# End of reading coalitions from file
 
-#Population for east and west germany https://www.destatis.de/EN/FactsFigures/SocietyState/Population/CurrentPopulation/Tables_/lrbev03.html
-
-# Gdp for iceland http://www.theworldeconomy.org/histostats/histostats-table01-4.pdf
-
-# for lichtenstein and monaco took the average of 9 countries(ALMOST SAME think about it)
 print [c.name for c in coalitions]
 
 # for i, coalition_i in enumerate(coalitions):
