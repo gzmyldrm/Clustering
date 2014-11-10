@@ -55,6 +55,16 @@ def distance_4a(A, B):
     return dist
 # End of geocode distance combination with quadratic pop and gdp
 
+def distance_5(A, B):
+    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.pop-B.pop)/abs(A.pop+B.pop)
+    return dist
+# End of geocode distance combination with propotional pop
+
+def distance_6(A, B):
+    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
+    return dist
+# End of geocode distance combination with propotional pop
+
 def midpoint(A,B):
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
      h = Geodesic.WGS84.Direct(A.lat, A.lng, d['azi1'], d['s12']/2)
