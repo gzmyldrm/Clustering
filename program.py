@@ -23,47 +23,47 @@ class coalition:
 
 def distance_1(A, B):
     dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
-    return dist['s12']
-# End of geocode distance
+    return dist['s12']/1000
+# End of geocode distance dist['s12'] is in meters
 
 def distance_2(A, B):
-    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.pop-B.pop)
-    return dist
+    dist_2 = distance_1(A, B)*abs(A.pop-B.pop)
+    return dist_2
 # End of geocode distance combination with pop
 
 def distance_2a(A, B):
-    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.pop-B.pop)**2
-    return dist
+    dist_2a = distance_1(A, B)*abs(A.pop-B.pop)**2
+    return dist_2a
 # End of geocode distance combination with quadratic pop 
 
 def distance_3(A, B):
-    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.gdp-B.gdp)
-    return dist
+    dist_3 = distance_1(A, B)*abs(A.gdp-B.gdp)
+    return dist_3
 # End of geocode distance combination with gdp
 
 def distance_3a(A, B):
-    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.gdp-B.gdp)**2
-    return dist
+    dist_3a = distance_1(A, B)*abs(A.gdp-B.gdp)**2
+    return dist_3a
 # End of geocode distance combination with quadratic gdp
 
 def distance_4(A, B):
-    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.pop-B.pop)*abs(A.gdp-B.gdp)
-    return dist
+    dist_4 = distance_1(A, B)*abs(A.pop-B.pop)*abs(A.gdp-B.gdp)
+    return dist_4
 # End of geocode distance combination with pop and gdp
 
 def distance_4a(A, B):
-    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.pop-B.pop)**2*abs(A.gdp-B.gdp)**2
-    return dist
+    dist_4a = distance_1(A, B)*abs(A.pop-B.pop)**2*abs(A.gdp-B.gdp)**2
+    return dist_4a
 # End of geocode distance combination with quadratic pop and gdp
 
 def distance_5(A, B):
-    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.pop-B.pop)/abs(A.pop+B.pop)
-    return dist
+    dist_5 = distance_1(A, B)*abs(A.pop-B.pop)/abs(A.pop+B.pop)
+    return dist_5
 # End of geocode distance combination with propotional pop
 
 def distance_6(A, B):
-    dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
-    return dist
+    dist_6 = distance_1(A, B)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
+    return dist_6
 # End of geocode distance combination with propotional pop
 
 def midpoint(A,B):
@@ -87,7 +87,7 @@ def merge(A, B):
 # End of merge
 
 # Choose the distance function here
-distance = distance_1
+distance = distance_3a
 
 file = open("Coalitions geodistance.txt", "w")
 
@@ -139,7 +139,7 @@ print [c.name for c in coalitions]
   #       if i >= j:
    #         print distance(coalition_i, coalition_j)
 
-while len(coalitions)>3:
+while len(coalitions)>2:
 
     min_distance = 999999999999999.
     first_coalition = None
