@@ -5,6 +5,7 @@ from math import radians, degrees, cos, sin, sqrt, atan2, asin, fabs, pi
 import sys
 sys.path.append("/usr/local/lib/python/site-packages")
 from geographiclib.geodesic import Geodesic
+import time
 
 class coalition:
     def __init__(self, 
@@ -88,6 +89,8 @@ def merge(A, B):
 # Choose the distance function here
 distance = distance_1
 
+file = open("Coalitions geodistance.txt", "w")
+
 coalitions = [
 coalition("Albania", 41.3275459, 19.8186982, 1227, 1229),
 coalition("Austria", 48.2081743, 16.3738189, 6935, 25702),
@@ -157,16 +160,15 @@ while len(coalitions)>3:
     coalitions.remove(first_coalition)
     coalitions.remove(second_coalition)
     
-   
-    print [c.name for c in coalitions]
-    
+    #print [c.name for c in coalitions]
 
+    outfile_name = "out_"+time.strftime("%Y_%m_%d_%H%M")+".txt"
 
+    out_f = open(outfile_name, "w")
 
-            
-
-
-
+    for c in coalitions:
+        out_f.write(c.name)
+        out_f.write("\n\n")
 
         
 
