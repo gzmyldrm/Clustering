@@ -7,24 +7,34 @@ sys.path.append("/usr/local/lib/python/site-packages")
 from geographiclib.geodesic import Geodesic
 import time
 
+default_dummy_distance = 999999999999999
 class coalition:
     def __init__(self, 
                  name,
                  lat, 
                  lng, 
                  gdp,
-                 pop):
+                 pop,
+                 regime):
         self.name = name
         self.lat = lat
         self.lng = lng
         self.gdp = gdp
         self.pop = pop
+        self.regime = regime
     # End of constructor
 
 def distance_1(A, B):
     dist = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
     return dist['s12']/1000
 # End of geocode distance dist['s12'] is in meters
+
+def distance_regime(A, B):
+    if A.regime = B.regime:
+       return 1
+    else: 
+       return default_dummy_distance
+# End of regime type
 
 def distance_2(A, B):
     dist_2 = distance_1(A, B)*abs(A.pop-B.pop)
@@ -76,12 +86,14 @@ def merge(A, B):
     new_lat, new_lng = midpoint(A, B) 
     new_pop = (A.pop + B.pop)/2
     new_gdp = (A.gdp + B.gdp)/2
+    new_regime = A.regime
 
     C = coalition(new_name,
                   new_lat, 
                   new_lng,
                   new_pop,
-                  new_gdp)
+                  new_gdp,
+                  new_regime)
     
     return C
 # End of merge
@@ -100,14 +112,16 @@ for line in in_f:
         continue
     
     # split by "," and remove extra whitespace
-    [name, lat, lng, gdp, pop] = [x.strip() for x in line.split(",")]
+    [name, lat, lng, pop, gdp, regime] = [x.strip() for x in line.split(",")]
 
     # Create coalition object and add to list
     coalitions.append(coalition(name, 
                                 float(lat), 
                                 float(lng), 
-                                int(gdp), 
-                                int(pop)))
+                                int(pop), 
+                                int(gdp),
+                                int (regime)))
+
 # End of reading coalitions from file
 
 print [c.name for c in coalitions]
@@ -119,7 +133,7 @@ print [c.name for c in coalitions]
 
 while len(coalitions)>2:
 
-    min_distance = 999999999999999.
+    min_distance = default_dummy_distance
     first_coalition = None
     second_coalition = None
 
