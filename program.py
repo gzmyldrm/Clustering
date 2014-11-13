@@ -8,41 +8,45 @@ from geographiclib.geodesic import Geodesic
 import time
 
 default_dummy_distance = 999999999999999
+
 class coalition:
     def __init__(self, 
                  name,
                  lat, 
                  lng, 
-                 gdp,
                  pop,
+                 gdp,
                  regime):
         self.name = name
         self.lat = lat
         self.lng = lng
-        self.gdp = gdp
         self.pop = pop
+        self.gdp = gdp
         self.regime = regime
     # End of constructor
 
-def distloc(A, B):
-    distloc = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
-    return dist['s12']/1000
-# End of location distance dist['s12'] is in meters
-
 def distregime(A, B):
-    if A.regime = B.regime:
+    if A.regime == B.regime:
        return 1
     else: 
-       return default_dummy_distance
+       return 1
+
+# return default_dummy_distance if you want to insert regime
 # End of regime distance
 
+def distloc(A, B):
+    distloc = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
+    return distloc['s12']/1000*distregime(A, B)
+# End of location distance dist['s12'] is in meters
+
+
 def distpop(A, B):
-    distpop = distanceloc(A, B)*abs(A.pop-B.pop)
+    distpop = distloc(A, B)*abs(A.pop-B.pop)
     return distpop
 # End of geocode distance combination with pop
 
 def distpop2(A, B):
-    distpop2 = distanceloc(A, B)*abs(A.pop-B.pop)**2
+    distpop2 = distloc(A, B)*abs(A.pop-B.pop)**2
     return distpop2
 # End of geocode distance combination with quadratic pop 
 
@@ -99,7 +103,7 @@ def merge(A, B):
 # End of merge
 
 # Choose the distance function here
-distance = distloc
+distance = distpop2
 
 in_f = open("input_coalitions.txt", "r")
 
@@ -124,13 +128,16 @@ for line in in_f:
 
 # End of reading coalitions from file
 
-print [c.name for c in coalitions]
+#print [c.name for c in coalitions]
 
 # for i, coalition_i in enumerate(coalitions):
  #    for j, coalition_j in enumerate(coalitions):
   #       if i >= j:
    #         print distance(coalition_i, coalition_j)
 
+outfile_name = "out_"+time.strftime("%Y_%m_%d_%H%M")+".odt"
+
+out_f = open(outfile_name, "w")
 while len(coalitions)>2:
 
     min_distance = default_dummy_distance
@@ -148,21 +155,18 @@ while len(coalitions)>2:
                 first_coalition = coalition_i
                 second_coalition = coalition_j
     coalitions.append(merge(first_coalition, second_coalition))
-   # print midpoint(first_coalition, second_coalition)
+    #print midpoint(first_coalition, second_coalition)
     coalitions.remove(first_coalition)
     coalitions.remove(second_coalition)
     
     #print [c.name for c in coalitions]
-
-    outfile_name = "out_"+time.strftime("%Y_%m_%d_%H%M")+".txt"
-
-    out_f = open(outfile_name, "w")
-
+    
     for c in coalitions:
         out_f.write(c.name)
-        out_f.write("\n\n")
+        out_f.write(", ")
+    out_f.write("\n\n")
 
-        
+      
 
 
 
