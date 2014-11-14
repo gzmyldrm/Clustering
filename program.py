@@ -7,7 +7,7 @@ sys.path.append("/usr/local/lib/python/site-packages")
 from geographiclib.geodesic import Geodesic
 import time
 
-default_dummy_distance = 999999999999999
+default_dummy_distance = float("inf")
 
 class coalition:
     def __init__(self, 
@@ -29,14 +29,14 @@ def distregime(A, B):
     if A.regime == B.regime:
        return 1
     else: 
-       return 1
-
+       return default_dummy_distance
+# return 1 if you do not want the regime
 # return default_dummy_distance if you want to insert regime
 # End of regime distance
 
 def distloc(A, B):
     distloc = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
-    return distloc['s12']/1000*distregime(A, B)
+    return (distloc['s12']/1000)*distregime(A, B)
 # End of location distance dist['s12'] is in meters
 
 
@@ -65,9 +65,9 @@ def distpopgdp(A, B):
     return distpopgdp
 # End of geocode distance combination with pop and gdp
 
-def distance_4a(A, B):
-    dist_4a = distloc(A, B)*abs(A.pop-B.pop)**2*abs(A.gdp-B.gdp)**2
-    return dist_4a
+def distpopgdp2(A, B):
+    distpopgdp2 = distloc(A, B)*abs(A.pop-B.pop)**2*abs(A.gdp-B.gdp)**2
+    return distpopgdp2
 # End of geocode distance combination with quadratic pop and gdp
 
 def distpopratio(A, B):
@@ -79,6 +79,16 @@ def distgdpratio(A, B):
     distgdpratio = distloc(A, B)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
     return distgdpratio
 # End of geocode distance combination with propotional gdp
+
+def distpopgdpratio(A, B):
+    distpopgdpratio = distloc(A, B)*abs(A.pop-B.pop)/abs(A.pop+B.pop)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
+    return distpopgdpratio
+# End of geocode distance combination with propotional pop and gdp 
+
+def distpopgdpratio2(A, B):
+    distpopgdpratio2 = distloc(A, B)*(abs(A.pop-B.pop)/abs(A.pop+B.pop))**2*(abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp))**2
+    return distpopgdpratio2
+# End of geocode distance combination with quadratic propotional pop and gdp 
 
 def midpoint(A,B):
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
@@ -103,7 +113,7 @@ def merge(A, B):
 # End of merge
 
 # Choose the distance function here
-distance = distpop2
+distance = distpopgdpratio2
 
 in_f = open("input_coalitions.txt", "r")
 
@@ -155,6 +165,7 @@ while len(coalitions)>2:
                 first_coalition = coalition_i
                 second_coalition = coalition_j
     coalitions.append(merge(first_coalition, second_coalition))
+    #print distance(first_coalition, second_coalition)
     #print midpoint(first_coalition, second_coalition)
     coalitions.remove(first_coalition)
     coalitions.remove(second_coalition)
