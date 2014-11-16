@@ -101,7 +101,14 @@ def merge(A, B):
 # End of merge
 
 # Choose the distance function here
-distance = distpopgdpratio2
+if len(sys.argv == 2):
+    distance_name = sys.argv[1]
+else:
+    print "Invalid number of command line arguments"
+    print "Usage: program.py ditance_function_name"
+    print sys.exit()
+
+distance = distances[distance_name]
 
 in_f = open("input_coalitions.txt", "r")
 
