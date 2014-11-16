@@ -101,7 +101,7 @@ def merge(A, B):
 # End of merge
 
 # Choose the distance function here
-if len(sys.argv == 2):
+if len(sys.argv) == 2:
     distance_name = sys.argv[1]
 else:
     print "Invalid number of command line arguments"
