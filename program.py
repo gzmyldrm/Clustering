@@ -25,6 +25,9 @@ class coalition:
         self.regime = regime
     # End of constructor
 
+# Create a dictionary of distances
+distances = {}
+
 def distregime(A, B):
     if A.regime == B.regime:
        return 1
@@ -39,56 +42,41 @@ def distloc(A, B):
     return (distloc['s12']/1000)*distregime(A, B)
 # End of location distance dist['s12'] is in meters
 
+# Add the more complicated distregime and distloc functions manuallly:
+distances["distregime"] = distregime
+distances["distloc"] = distloc
 
-def distpop(A, B):
-    distpop = distloc(A, B)*abs(A.pop-B.pop)
-    return distpop
-# End of geocode distance combination with pop
+# And for the rest, use lambda magic (-;
 
-def distpop2(A, B):
-    distpop2 = distloc(A, B)*abs(A.pop-B.pop)**2
-    return distpop2
-# End of geocode distance combination with quadratic pop 
+# geocode distance combination with pop
+distances["distpop"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)
 
-def distgdp(A, B):
-    distgdp = distloc(A, B)*abs(A.gdp-B.gdp)
-    return distgdp
-# End of geocode distance combination with gdp
+# distance combination with quadratic pop d
+distances["distpop2"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)**2
 
-def distgdp2(A, B):
-    distgdp2 = distloc(A, B)*abs(A.gdp-B.gdp)**2
-    return distgdp2
-# End of geocode distance combination with quadratic gdp
+# geocode distance combination with gdp
+distances["distgdp"] = lambda A,B: distloc(A, B)*abs(A.gdp-B.gdp)
 
-def distpopgdp(A, B):
-    distpopgdp = distloc(A, B)*abs(A.pop-B.pop)*abs(A.gdp-B.gdp)
-    return distpopgdp
-# End of geocode distance combination with pop and gdp
+# geocode distance combination with quadratic gdp
+distances["distgdp2"] = lambda A,B: distloc(A, B)*abs(A.gdp-B.gdp)**2
 
-def distpopgdp2(A, B):
-    distpopgdp2 = distloc(A, B)*abs(A.pop-B.pop)**2*abs(A.gdp-B.gdp)**2
-    return distpopgdp2
-# End of geocode distance combination with quadratic pop and gdp
+# geocode distance combination with pop and gdp
+distances["distpopgdp"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)*abs(A.gdp-B.gdp)
 
-def distpopratio(A, B):
-    distpopratio = distloc(A, B)*abs(A.pop-B.pop)/abs(A.pop+B.pop)
-    return distpopratio
-# End of geocode distance combination with propotional pop
+# geocode distance combination with quadratic pop and gdp
+distances["distpopgdp2"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)**2*abs(A.gdp-B.gdp)**2
 
-def distgdpratio(A, B):
-    distgdpratio = distloc(A, B)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
-    return distgdpratio
-# End of geocode distance combination with propotional gdp
+# geocode distance combination with propotional pop
+distances["distpopratio"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)/abs(A.pop+B.pop)
 
-def distpopgdpratio(A, B):
-    distpopgdpratio = distloc(A, B)*abs(A.pop-B.pop)/abs(A.pop+B.pop)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
-    return distpopgdpratio
-# End of geocode distance combination with propotional pop and gdp 
+# geocode distance combination with propotional gdp
+distances["distgdpratio"] = lambda A,B: distloc(A, B)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
 
-def distpopgdpratio2(A, B):
-    distpopgdpratio2 = distloc(A, B)*(abs(A.pop-B.pop)/abs(A.pop+B.pop))**2*(abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp))**2
-    return distpopgdpratio2
-# End of geocode distance combination with quadratic propotional pop and gdp 
+# geocode distance combination with propotional pop and gdp 
+distances["distpopgdpratio"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)/abs(A.pop+B.pop)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
+
+# geocode distance combination with quadratic propotional pop and gdp 
+distances["distpopgdpratio2"] = lambda A,B: distloc(A, B)*(abs(A.pop-B.pop)/abs(A.pop+B.pop))**2*(abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp))**2
 
 def midpoint(A,B):
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
