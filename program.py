@@ -165,6 +165,10 @@ while len(coalitions)>2:
                 first_coalition = coalition_i
                 second_coalition = coalition_j
     coalitions.append(merge(first_coalition, second_coalition))
+    out_f.write(first_coalition.name) 
+    out_f.write(second_coalition.name)
+    out_f.write('distance is'.format(distloc(first_coalition, second_coalition)))
+    out_f.write('midpoint is'.format(midpoint(first_coalition, second_coalition)))
     #print distance(first_coalition, second_coalition)
     #print midpoint(first_coalition, second_coalition)
     coalitions.remove(first_coalition)
