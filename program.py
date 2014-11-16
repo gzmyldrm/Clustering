@@ -140,7 +140,7 @@ for line in in_f:
   #       if i >= j:
    #         print distance(coalition_i, coalition_j)
 
-outfile_name = "out_"+time.strftime("%Y_%m_%d_%H%M")+".odt"
+outfile_name = "out_"+distance_name+"_"++time.strftime("%Y_%m_%d_%H%M")+".odt"
 
 out_f = open(outfile_name, "w")
 while len(coalitions)>2:
