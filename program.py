@@ -6,7 +6,7 @@ import sys
 sys.path.append("/usr/local/lib/python/site-packages")
 from geographiclib.geodesic import Geodesic
 import time
-
+from matrix2latex import matrix2latex
 default_dummy_distance = float("inf")
 
 class coalition:
@@ -78,16 +78,22 @@ distances["distpopgdpratio"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)/abs(A.
 # geocode distance combination with quadratic propotional pop and gdp 
 distances["distpopgdpratio2"] = lambda A,B: distloc(A, B)*(abs(A.pop-B.pop)/abs(A.pop+B.pop))**2*(abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp))**2
 
+# geocode distance combination with pop*gdp 
+distances["distpop*gdp"] = lambda A,B: distloc(A, B)*abs(A.pop*A.gdp-B.pop*B.gdp)
+
+# geocode distance combination with propotional pop*gdp 
+distances["distpop*gdpratio"] = lambda A,B: distloc(A, B)*abs(A.pop*A.gdp-B.pop*B.gdp)/abs(A.pop*A.gdp+B.pop*B.gdp)
+
 def midpoint(A,B):
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
      h = Geodesic.WGS84.Direct(A.lat, A.lng, d['azi1'], d['s12']/2)
      return h['lat2'], h['lon2']
 
 def merge(A, B):
-    new_name = "{0}_{1}".format(A.name, B.name)
+    new_name = "{0}-{1}".format(A.name, B.name)
     new_lat, new_lng = midpoint(A, B) 
-    new_pop = (A.pop + B.pop)/2
-    new_gdp = (A.gdp + B.gdp)/2
+    new_pop = A.pop + B.pop
+    new_gdp = A.gdp + B.gdp
     new_regime = A.regime
 
     C = coalition(new_name,
@@ -133,16 +139,12 @@ for line in in_f:
 
 # End of reading coalitions from file
 
-#print [c.name for c in coalitions]
 
-# for i, coalition_i in enumerate(coalitions):
- #    for j, coalition_j in enumerate(coalitions):
-  #       if i >= j:
-   #         print distance(coalition_i, coalition_j)
-
-outfile_name = "out_"+distance_name+"_"++time.strftime("%Y_%m_%d_%H%M")+".odt"
+outfile_name = "out_"+distance_name+"_"+time.strftime("%Y_%m_%d_%H%M")+".odt"
 
 out_f = open(outfile_name, "w")
+
+m = [[distance_name],['First coalition', 'Second coalition', 'distance', 'pop', 'gdp']] # python nested list
 while len(coalitions)>2:
 
     min_distance = default_dummy_distance
@@ -159,30 +161,41 @@ while len(coalitions)>2:
                 min_distance = distance(coalition_i, coalition_j)
                 first_coalition = coalition_i
                 second_coalition = coalition_j
-    coalitions.append(merge(first_coalition, second_coalition))
 
-    
-    #print distance(first_coalition, second_coalition)
-    #print midpoint(first_coalition, second_coalition)
+    coalitions.append(merge(first_coalition, second_coalition))
     coalitions.remove(first_coalition)
     coalitions.remove(second_coalition)
     
     tmp_lat, tmp_lng =  midpoint(first_coalition, second_coalition)
     out_f.write(first_coalition.name) 
     out_f.write(", ")
-    
     out_f.write(second_coalition.name)
     out_f.write("\n")
-    out_f.write('distance is {0}'.format(distloc(first_coalition, second_coalition)))
+    out_f.write('geographical distance is {0}'.format(distloc(first_coalition, second_coalition)))
     out_f.write("\n")
     out_f.write('midpoint is lat={0} / lng={1}'.format(tmp_lat, tmp_lng))
     out_f.write("\n")
-    #print [c.name for c in coalitions]
-    
+    out_f.write('gdps are {0}'.format(first_coalition.gdp))
+    out_f.write(", ")
+    out_f.write('{0}'.format(second_coalition.gdp))
+    out_f.write("\n")
+    out_f.write('populations are {0}'.format(first_coalition.pop))
+    out_f.write(", ")
+    out_f.write('{0}'.format(second_coalition.pop))
+    out_f.write("\n")
+
+    m.append([first_coalition.name, second_coalition.name,  distance(first_coalition, second_coalition), first_coalition.pop, second_coalition.pop])
+   
+
     for c in coalitions:
         out_f.write(c.name)
         out_f.write(", ")
     out_f.write("\n\n")
+
+
+
+t = matrix2latex(m)
+out_f.write(t)
 
       
 
