@@ -1,5 +1,5 @@
 python program.py distloc
-:'python program.py distpop
+python program.py distpop
 python program.py distpop2
 python program.py distgdp
 python program.py distgdp2
@@ -11,4 +11,5 @@ python program.py distpopgdpratio
 python program.py distpopgdpratio2
 python program.py distpop*gdp
 python program.py distpop*gdpratio
-'
+python program.py distpercapitagdp
+python program.py distpercapitagdp2

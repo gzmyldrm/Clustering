@@ -3,7 +3,7 @@ Albania, 41.3275459, 19.8186982, 1227, 1229, 0
 Austria, 48.2081743, 16.3738189, 6935, 25702, 1
 Belgium, 50.8503396, 4.3517103, 8639, 47190, 1
 Bulgaria, 42.6977082, 23.3218675, 7251, 11971, 0
-Czech Republic, 50.0755381, 14.4378005, 12389, 43368 ,0
+Czechoslovakia, 50.0755381, 14.4378005, 12389, 43368 ,0
 Denmark,  55.6760968, 12.5683371, 4271, 29654, 1
 Finland, 60.17332440000001, 24.9410248, 4009, 17051, 1
 France,  48.856614, 2.3522219,42518, 220492, 1
@@ -14,23 +14,23 @@ Hungary, 47.497912, 19.040235, 9338, 23158, 0
 Iceland, 64.133333, -21.933333, 143, 762, 1
 Ireland, 53.3498053, -6.2603097, 2963, 10231, 1
 Italy, 41.8723889, 12.4801802, 47105, 164957, 1
-Liechtenstein, 47.14137, 9.5207, 14, 159, 1
+#Liechtenstein, 47.14137, 9.5207, 14, 159, 1
 Luxembourg, 49.815273, 6.129583, 296, 2481, 1
-Monaco,  43.73841760000001, 7.4246158, 18, 158, 1
+#Monaco,  43.73841760000001, 7.4246158, 18, 158, 1
 Netherlands, 52.3702157, 4.895167900000001, 10114, 60642, 1
 Norway, 59.9138688, 10.7522454, 3265, 17728, 1
 Poland, 52.2296756, 21.0122287, 24824, 60742, 0
 Portugal,  38.7222524, -9.1393366, 8443, 17615, 1
 Romania, 44.4325, 26.103889, 16311, 19279, 0
 Soviet Union, 55.755826, 37.6173, 179571, 510243, 0
-Spain, 40.4167754, -3.7037902, 28063,61429, 1
+Spain, 40.4167754, -3.7037902, 28063,61429, 2
 Sweden, 59.3293235, 18.0685808, 7014, 47478, 1
 Switzerland, 46.9479222, 7.4446085, 4694, 42545, 1
 United Kingdom,  51.5073509, -0.1277583, 50127, 347850, 1
 Yugoslavia, 44.816667, 20.466667, 16298, 25277, 0
 # Google map - according to the capitals 1950
 #
-# GDP for eat and west germany http://books.google.at/books?id=YeoEiNLtrLsC&pg=PA178&lpg=PA178&dq=Maddison,+1950+east+german+gdp&source=bl&ots=TAkNRGDaAR&sig=jzG_cfbPVLdkOeLOug4zHlDyCjA&hl=en&sa=X&ei=JNJgVLPJA4GOPcuSgLAB&ved=0CB8Q6AEwAA#v=onepage&q=Maddison%2C%201950%20east%20german%20gdp&f=false
+# GDP for east and west germany http://books.google.at/books?id=YeoEiNLtrLsC&pg=PA178&lpg=PA178&dq=Maddison,+1950+east+german+gdp&source=bl&ots=TAkNRGDaAR&sig=jzG_cfbPVLdkOeLOug4zHlDyCjA&hl=en&sa=X&ei=JNJgVLPJA4GOPcuSgLAB&ved=0CB8Q6AEwAA#v=onepage&q=Maddison%2C%201950%20east%20german%20gdp&f=false
 #
 #Population for east and west germany https://www.destatis.de/EN/FactsFigures/SocietyState/Population/CurrentPopulation/Tables_/lrbev03.html
 #
