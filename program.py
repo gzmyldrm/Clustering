@@ -9,6 +9,10 @@ import time
 from matrix2latex import matrix2latex
 default_dummy_distance = float("inf")
 
+from mpl_toolkits.basemap import Basemap
+import numpy as np
+import matplotlib.pyplot as plt
+
 class coalition:
     def __init__(self, 
                  name,
@@ -96,8 +100,9 @@ def midpoint(A,B):
      return h['lat2'], h['lon2']
 
 def weightedmidpoint(A,B):
+     w = 1
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
-     h = Geodesic.WGS84.Direct(A.lat, A.lng, d['azi1'], d['s12']*A.pop*A.gdp/(A.pop*A.gdp+B.pop*B.gdp))
+     h = Geodesic.WGS84.Direct(A.lat, A.lng, d['azi1'], d['s12']*(w*B.pop+(1-w)*B.gdp)/(w*A.pop+(1-w)*A.gdp+w*B.pop+(1-w)*B.gdp))
      return h['lat2'], h['lon2']
 
 def merge(A, B):
@@ -184,7 +189,7 @@ while len(coalitions)>3:
     coalitions.remove(first_coalition)
     coalitions.remove(second_coalition)
     
-    """tmp_lat, tmp_lng =  midpoint(first_coalition, second_coalition)"""
+    """tmp_lat, tmp_lng =  midpoint(first_coalition, second_coalition)
     out_f.write(first_coalition.name) 
     out_f.write(", ")
     out_f.write(second_coalition.name)
@@ -201,6 +206,7 @@ while len(coalitions)>3:
     out_f.write(", ")
     out_f.write('{0}'.format(second_coalition.pop))
     out_f.write("\n")
+    """
 
     m.append([first_coalition.name, second_coalition.name,  int(distance(first_coalition, second_coalition))])
    
