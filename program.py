@@ -1,20 +1,32 @@
+
+########################################
+# Imports 
+########################################
+
 from __future__ import division
-import math
-import geopy
-from geopy.distance import GreatCircleDistance
-from math import radians, degrees, cos, sin, sqrt, atan2, asin, fabs, pi
+
 import sys
+import math
+import time
+
+import numpy as np
+
 sys.path.append("/usr/local/lib/python/site-packages")
 from geographiclib.geodesic import Geodesic
-import time
 from matrix2latex import matrix2latex
+from mpl_toolkits.basemap import Basemap
+
+
+########################################
+# Configuration
+########################################
+
 default_dummy_distance = float("inf")
 
-from mpl_toolkits.basemap import Basemap
-import numpy as np
-import matplotlib.pyplot as plt
 
-
+########################################
+# Class: coalition
+########################################
 
 class coalition:
     def __init__(self, 
@@ -32,8 +44,10 @@ class coalition:
         self.regime = regime
     # End of constructor
 
-# Create a dictionary of distances
-distances = {}
+
+########################################
+# distgregime
+########################################
 
 def distregime(A, B):
     if A.regime == B.regime:
@@ -45,86 +59,115 @@ def distregime(A, B):
 # End of regime distance
 
 
-def distloc(A, B):
-    distloc = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
-    return (int(distloc['s12'])*distregime(A, B)) 
-# End of location distance dist['s12'] is in meters
+########################################
+# normalize
+########################################
 
-# Add the more complicated distregime and distloc functions manuallly:
-distances["distregime"] = distregime
-distances["distloc"] = distloc
+def normalize(x, 
+              input_min, 
+              input_max, 
+              target_min = 0, 
+              target_max = 1):
+    """Use function of the form:
+    y = a*x + b 
+    Determine coefficients so that:
+    y(input_min) = target_min and
+    y(input_max) = target_max
+    """
+    
+    a = target_max - (target_max - target_min) / (input_max - input_min)
+    b = target_min - (input_min * (target_max - target_min))/(input_max - input_min)
+    
+    return a*x + b
+# end of normalize
 
-# And for the rest, use lambda magic (-;
 
-# geocode distance combination with pop
-distances["distpop"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)
+########################################
+# distloc
+########################################
 
-# distance combination with quadratic pop d
-distances["distpop2"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)**2
+def distloc(A, B, 
+            input_min=-1, 
+            input_max=-1, 
+            target_min = 0, 
+            target_max = 1):
 
-# geocode distance combination with gdp
-distances["distgdp"] = lambda A,B: distloc(A, B)*abs(A.gdp-B.gdp)
+    distloc_obj = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)/1000.
+    distloc_km = distloc['s12']/1000.
+    
+    # Per default: do NOT normalize
+    if input_min==-1 and input_max ==-1:
+        return distloc_km * distregime(A, B)
+    else:
+        norm_distloc_km = normalize(distloc_km, input_min, input_max, target_min, target_max) 
+        return norm_distloc_km * distregime(A, B)
+# End of distloc
 
-# geocode distance combination with quadratic gdp
-distances["distgdp2"] = lambda A,B: distloc(A, B)*abs(A.gdp-B.gdp)**2
 
-# geocode distance combination with pop and gdp
-distances["distpopgdp"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)*abs(A.gdp-B.gdp)
+########################################
+# distonlygdp
+########################################
 
-# geocode distance combination with quadratic pop and gdp
-distances["distpopgdp2"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)**2*abs(A.gdp-B.gdp)**2
+def distonlygdp(A, B, 
+            input_min=-1, 
+            input_max=-1, 
+            target_min = 0, 
+            target_max = 1):
 
-# geocode distance combination with propotional pop
-distances["distpopratio"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)/abs(A.pop+B.pop)
+    distonlygdp = abs(A.gdp - B.gdp)
 
-# geocode distance combination with propotional gdp
-distances["distgdpratio"] = lambda A,B: distloc(A, B)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
+    # Per default: do NOT normalize
+    if input_min==-1 and input_max ==-1:
+        return distonlygdp
+    else:
+        return normalize(distonlygdp, input_min, input_max, target_min, target_max) 
+# End of distonlygdp
 
-# geocode distance combination with propotional pop and gdp 
-distances["distpopgdpratio"] = lambda A,B: distloc(A, B)*abs(A.pop-B.pop)/abs(A.pop+B.pop)*abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp)
 
-# geocode distance combination with quadratic propotional pop and gdp 
-distances["distpopgdpratio2"] = lambda A,B: distloc(A, B)*(abs(A.pop-B.pop)/abs(A.pop+B.pop))**2*(abs(A.gdp-B.gdp)/abs(A.gdp+B.gdp))**2
+########################################
+# distonlypop
+########################################
 
-# geocode distance combination with pop*gdp 
-distances["distpop*gdp"] = lambda A,B: distloc(A, B)*abs(A.pop*A.gdp-B.pop*B.gdp)
+def distonlypop(A, B, 
+            input_min=-1, 
+            input_max=-1, 
+            target_min = 0, 
+            target_max = 1):
 
-# geocode distance combination with propotional pop*gdp 
-distances["distpop*gdpratio"] = lambda A,B: distloc(A, B)*abs(A.pop*A.gdp-B.pop*B.gdp)/abs(A.pop*A.gdp+B.pop*B.gdp)
+    distonlypop = abs(A.pop - B.pop)
 
-# geocode distance combination with per capita gdp
-distances["distpercapitagdp"] = lambda A,B: distloc(A, B)*abs(A.gdp/A.pop-B.gdp/B.pop)
+    # Per default: do NOT normalize
+    if input_min==-1 and input_max ==-1:
+        return distonlypop
+    else:
+        return normalize(distonlypop, input_min, input_max, target_min, target_max) 
+# End of distonlypop
 
-# geocode distance combination with quadratic per capita gdp 
-distances["distpercapitagdp2"] = lambda A,B: distloc(A, B)*abs(A.gdp/A.pop-B.gdp/B.pop)**2
 
-# geocode distance combination with propotional pop*gdp square root 
-distances["distpop*gdpratiosqrt"] = lambda A,B: distloc(A, B)*math.sqrt(abs(A.pop*A.gdp-B.pop*B.gdp)/abs(A.pop*A.gdp+B.pop*B.gdp))
-
-# new function ideas
-
-distances["distgdppop"] = lambda A,B: distloc(A, B)*A.gdp*A.pop*B.gdp*B.pop
-distances["distsqrtgdppop"] = lambda A,B: distloc(A, B)*math.sqrt(A.gdp*A.pop*B.gdp*B.pop)
-distances["distgdppopA"] = lambda A,B: distloc(A, B)*A.gdp*A.pop
-distances["sqrtdistgdppop"] = lambda A,B: math.sqrt(distloc(A, B))*A.gdp*A.pop
-distances["distgdppop-1"] = lambda A,B: distloc(A, B)*A.gdp**-1*A.pop**-1
-distances["distgdppercapita"] = lambda A,B: distloc(A, B)*A.gdp*A.pop**-1
-distances["distgdppercapita-1"] = lambda A,B: distloc(A, B)*A.gdp**-1*A.pop
-distances["distgdppercapitamin"] = lambda A,B: distloc(A, B)*min(A.gdp*A.pop**-1,B.gdp*B.pop**-1)
-distances["distgdppercapitamin-1"] = lambda A,B: distloc(A, B)*min(A.gdp**-1*A.pop,B.gdp**-1*B.pop)
-distances["distgdppercapitamax"] = lambda A,B: distloc(A, B)*max(A.gdp*A.pop**-1,B.gdp*B.pop**-1)
-distances["distgdppercapitamax-1"] = lambda A,B: distloc(A, B)*max(A.gdp**-1*A.pop,B.gdp**-1*B.pop)
+########################################
+# midpoint
+########################################
 
 def midpoint(A,B):
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
      h = Geodesic.WGS84.Direct(A.lat, A.lng, d['azi1'], d['s12']/2)
      return h['lat2'], h['lon2']
 
+
+########################################
+# weightedmidpoint
+########################################
+
 def weightedmidpoint(A,B):
      w = 1
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
      h = Geodesic.WGS84.Direct(A.lat, A.lng, d['azi1'], d['s12']*(w*B.pop+(1-w)*B.gdp)/(w*A.pop+(1-w)*A.gdp+w*B.pop+(1-w)*B.gdp))
      return h['lat2'], h['lon2']
+
+
+########################################
+# merge
+########################################
 
 def merge(A, B):
     new_name = "{0}, {1}".format(A.name, B.name)
@@ -142,6 +185,28 @@ def merge(A, B):
     
     return C
 # End of merge
+
+
+########################################
+# Composite distance functions
+########################################
+
+# Create a dictionary of distances
+distances = {}
+
+# Add the more complicated distregime and distloc functions manuallly:
+
+distances["normdistloc"] = lambda A,B,D: distloc(A, B, D["min_loc"], D["max_loc"])
+
+distances["normdistlocpop"] = lambda A,B,D: distloc(A, B, D["min_loc"], D["max_loc"]) * distonlypop(A, B, D["min_pop"], D["max_pop"])
+
+distances["normdistlocgdp"] = lambda A,B,D: distloc(A, B, D["min_loc"], D["max_loc"]) * distonlygdp(A, B, D["min_gdp"], D["max_gdp"])
+
+distances["normdistlocpopgdp"] = lambda A,B,D: distloc(A, B, D["min_loc"], D["max_loc"]) * distonlypop(A, B, D["min_pop"], D["max_pop"]) * distonlygdp(A, B, D["min_gdp"], D["max_gdp"])
+
+
+
+
 
 # Choose the distance function here
 if len(sys.argv) == 2:
@@ -193,28 +258,46 @@ n = [[distance_name],['Country', 'pop', 'gdp']] # python nested list
 '''
 
 
-# Calculate the max distance for normalization
-max_distance = 1.0
-for i, coalition_i in enumerate(coalitions):
-    for j, coalition_j in enumerate(coalitions):
-      
-     if i >= j:
-                continue
-    
-     if distloc(coalition_i, coalition_j) > max_distance:
-       max_distance = distloc(coalition_i, coalition_j)
-     '''out_f.write(coalition_i.name)
-     out_f.write(", ")
-     out_f.write(coalition_j.name)
-     out_f.write(", ")
-     out_f.write('distance is {0}'.format(distloc(coalition_i, coalition_j)))
-     out_f.write("\n\n")
-     '''
-out_f.write('max distance is {0}'.format(max_distance))     
 
 
 while len(coalitions)>1:
 
+    # Find maximum and minimum distance for normalization
+    minmax_dists = {    
+        "max_loc" : -9999,
+        "min_loc" : default_dummy_distance,
+        "max_gdp" : -9999,
+        "min_gdp" : default_dummy_distance,
+        "max_pop" : -9999,
+        "min_pop" : default_dummy_distance,
+    }
+
+    for i, coalition_i in enumerate(coalitions):
+        for j, coalition_j in enumerate(coalitions):
+      
+            if i >= j:
+                continue
+                
+            # Maximum Location Distance
+            if distloc(coalition_i, coalition_j) > minmax_dists["max_loc"]:
+                minmax_dists["max_loc"] = distloc(coalition_i, coalition_j)
+            # Minimum Location Distance
+            if distloc(coalition_i, coalition_j) < minmax_dists["min_loc"]:
+                minmax_dists["min_loc"] = distloc(coalition_i, coalition_j)
+            # Maximum GDP Distance
+            if distonlygdp(coalition_i, coalition_j) > minmax_dists["max_gdp"]:
+                minmax_dists["max_gdp"]= distonlygdp(coalition_i, coalition_j)
+            # Minimum GDP Distance
+            if distonlygdp(coalition_i, coalition_j) < minmax_dists["min_gdp"]:
+                minmax_dists["min_gdp"] = distonlygdp(coalition_i, coalition_j)
+            # Maximum POP Distance
+            if distonlypop(coalition_i, coalition_j) > minmax_dists["max_pop"]:
+                minmax_dists["max_pop"] = distonlypop(coalition_i, coalition_j)
+            # Minimum POP Distance
+            if distonlypop(coalition_i, coalition_j) < minmax_dists["min_pop"]:
+                minmax_dists["min_pop"] = distonlypop(coalition_i, coalition_j)
+    # Done finding maximum and minimum distances for normalization
+            
     min_distance = default_dummy_distance
     first_coalition = None
     second_coalition = None
@@ -225,8 +308,8 @@ while len(coalitions)>1:
             if i >= j:
                 continue
             
-            if distance(coalition_i, coalition_j) < min_distance: 
-                min_distance = distance(coalition_i, coalition_j)
+            if distance(coalition_i, coalition_j, minmax_dists) < min_distance: 
+                min_distance = distance(coalition_i, coalition_j, minmax_dists)
                 first_coalition = coalition_i
                 second_coalition = coalition_j
            
@@ -235,7 +318,7 @@ while len(coalitions)>1:
     coalitions.remove(second_coalition)
 
 
-    m.append([first_coalition.name, second_coalition.name, distance(first_coalition, second_coalition)])
+    m.append([first_coalition.name, second_coalition.name, distance(first_coalition, second_coalition, minmax_dists)])
    
 
    # for c in coalitions:
