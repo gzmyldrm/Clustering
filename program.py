@@ -44,9 +44,10 @@ def distregime(A, B):
 # return default_dummy_distance if you want to insert regime
 # End of regime distance
 
+
 def distloc(A, B):
     distloc = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
-    return (distloc['s12']/1000)*distregime(A, B)
+    return (int(distloc['s12'])*distregime(A, B)) 
 # End of location distance dist['s12'] is in meters
 
 # Add the more complicated distregime and distloc functions manuallly:
@@ -111,6 +112,8 @@ distances["distgdppercapita"] = lambda A,B: distloc(A, B)*A.gdp*A.pop**-1
 distances["distgdppercapita-1"] = lambda A,B: distloc(A, B)*A.gdp**-1*A.pop
 distances["distgdppercapitamin"] = lambda A,B: distloc(A, B)*min(A.gdp*A.pop**-1,B.gdp*B.pop**-1)
 distances["distgdppercapitamin-1"] = lambda A,B: distloc(A, B)*min(A.gdp**-1*A.pop,B.gdp**-1*B.pop)
+distances["distgdppercapitamax"] = lambda A,B: distloc(A, B)*max(A.gdp*A.pop**-1,B.gdp*B.pop**-1)
+distances["distgdppercapitamax-1"] = lambda A,B: distloc(A, B)*max(A.gdp**-1*A.pop,B.gdp**-1*B.pop)
 
 def midpoint(A,B):
      d = Geodesic.WGS84.Inverse(A.lat, A.lng, B.lat, B.lng)
@@ -150,7 +153,7 @@ else:
 
 distance = distances[distance_name]
 
-in_f = open("input_coalitions.txt", "r")
+in_f = open("input_western_europe.txt", "r")
 
 coalitions = []
 
@@ -182,11 +185,15 @@ m = [[distance_name],['First coalition', 'Second coalition', 'distance']] # pyth
 n = [[distance_name],['Country', 'pop', 'gdp']] # python nested list
 
 
+# write countries pop and gdp in table
 '''for i, coalition_i in enumerate(coalitions):
     n.append([coalition_i.name, coalition_i.pop, coalition_i.gdp])
  k = matrix2latex(n)
  out_f.write(k)
 '''
+
+
+# Calculate the max distance for normalization
 max_distance = 1.0
 for i, coalition_i in enumerate(coalitions):
     for j, coalition_j in enumerate(coalitions):
@@ -194,18 +201,18 @@ for i, coalition_i in enumerate(coalitions):
      if i >= j:
                 continue
     
-     if distance(coalition_i, coalition_j) > max_distance:
-     max_distance = distance(coalition_i, coalition_j)
-     out_f.write(coalition_i.name)
+     if distloc(coalition_i, coalition_j) > max_distance:
+       max_distance = distloc(coalition_i, coalition_j)
+     '''out_f.write(coalition_i.name)
      out_f.write(", ")
      out_f.write(coalition_j.name)
      out_f.write(", ")
      out_f.write('distance is {0}'.format(distloc(coalition_i, coalition_j)))
      out_f.write("\n\n")
-
+     '''
 out_f.write('max distance is {0}'.format(max_distance))     
 
-# write countries pop and gdp in table
+
 while len(coalitions)>1:
 
     min_distance = default_dummy_distance
@@ -218,7 +225,7 @@ while len(coalitions)>1:
             if i >= j:
                 continue
             
-            if distance(coalition_i, coalition_j) < min_distance:
+            if distance(coalition_i, coalition_j) < min_distance: 
                 min_distance = distance(coalition_i, coalition_j)
                 first_coalition = coalition_i
                 second_coalition = coalition_j

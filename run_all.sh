@@ -27,9 +27,10 @@ python program.py distsqrtgdppop
 python program.py distgdppopA
 python program.py sqrtdistgdppop
 python program.py distgdppop-1
-
+COMMENT
 python program.py distgdppercapita
 python program.py distgdppercapita-1
 python program.py distgdppercapitamin
 python program.py distgdppercapitamin-1
-COMMENT
+python program.py distgdppercapitamax
+python program.py distgdppercapitamax-1
