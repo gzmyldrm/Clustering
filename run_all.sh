@@ -1,36 +1,51 @@
+#./run_all.sh  -- in the console
 
-python program.py distloc
+
+python program_old.py distloc
+
 <<"COMMENT"
-python program.py distpop
-python program.py distpop2
-python program.py distgdp
-python program.py distgdp2
-python program.py distpopgdp
-python program.py distpercapitagdp
-
-python program.py distpopgdp2
-python program.py distpopratio
-python program.py distgdpratio
-python program.py distpopgdpratio
-python program.py distpopgdpratio2
-python program.py distpop*gdp
-python program.py distpop*gdpratio
-
-python program.py distpercapitagdp2
-python program.py distpop*gdpratiosqrt
-python program.py distgdppop
-python program.py distsqrtgdppop
+python program_old.py distpercapitagdp
+python program_old.py distmaxmin
+python program_old.py distmin
+python program_old.py distpop
+python program_old.py distpop2
+python program_old.py distgdp
+python program_old.py distgdp2
+python program_old.py distpopgdp
 
 
-python program.py distgdppop
-python program.py distsqrtgdppop
-python program.py distgdppopA
-python program.py sqrtdistgdppop
-python program.py distgdppop-1
+python program_old.py distpopgdp2
+python program_old.py distpopratio
+python program_old.py distgdpratio
+python program_old.py distpopgdpratio
+python program_old.py distpopgdpratio2
+python program_old.py distpop*gdp
+python program_old.py distpop*gdpratio
+
+python program_old.py distpercapitagdp2
+python program_old.py distpop*gdpratiosqrt
+python program_old.py distgdppop
+python program_old.py distsqrtgdppop
+
+
+python program_old.py distgdppop
+python program_old.py distsqrtgdppop
+python program_old.py distgdppopA
+python program_old.py sqrtdistgdppop
+python program_old.py distgdppop-1
+
+
+python program_old.py distgdppercapita-1
+
+python program_old.py distgdppercapitamin-1
+
+python program_old.py distgdppercapitamax-1
+
+
+python program_old.py distgdppercapitasubjective
+python program_old.py distgdppercapita
+python program_old.py distgdppercapitamin
+python program_old.py distgdppercapitamax
+python program_old.py distgrofman
+
 COMMENT
-python program.py distgdppercapita
-python program.py distgdppercapita-1
-python program.py distgdppercapitamin
-python program.py distgdppercapitamin-1
-python program.py distgdppercapitamax
-python program.py distgdppercapitamax-1
